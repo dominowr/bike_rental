@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+{% load template_filters %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand">DnDMotorcycles</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+            aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'index:index' %}">Home<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'rental:index-rental' %}">Rental<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'workshop:index-workshop' %}">WorkShop<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'contact:contact' %}">Contact<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% if user.is_authenticated %}
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-out' %}">Sign Out<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% else %}
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-in' %}">Sign In<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-up' %}">Sign Up<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% endif %}
+    </div>
+</nav>
+
+<main role="main">
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+        <div class="container">
+            <br>
+            <h1 class="display-3">Hello, {{ user.first_name }}</h1>
+        </div>
+    </div>
+    <div class="container">
+        {% if messages %}
+        {% for message in messages %}
+        {% if 'success' in message.tags %}
+        <div class="alert alert-success">
+            <div class="{{ message.tags }}">{{ message }}</div>
+        </div>
+        {% endif %}
+        {% if 'error' in message.tags %}
+        <div class="alert alert-danger">
+            <div class="{{ message.tags }}">{{ message }}</div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </div>
+    <div class="container">
+        <!-- Example row of columns -->
+        <div class="list">
+            <div class="jumbotron">
+                <h2>Your motorcycle reservations:</h2>
+                {% for reservation in motorcycle_reservations %}
+                <br>
+                <li> Motorcycle: {{ reservation.motorcycle }}</li>
+                <ul> Start date: {{ reservation.start_date }}</ul>
+                <ul> End date: {{ reservation.end_date }}</ul>
+                <div style="display: inline-block;">
+                    <p><a class="btn btn-secondary" href="{% url 'user_account:delete-motorcycle' reservation.id %}" role="button">Delete</a></p>
+                </div>
+                <div style="display: inline-block;">
+                    <button class="btn btn-secondary moto_update_button" role="button" data-reservation-id="{{ reservation.id }}">Update</button>
+                </div>
+                <input type="hidden" id="unavailable-dates-{{ reservation.id }}" value="{{ unavailable_dates|get_item:reservation.motorcycle }}">
+                <form method="post" action="{% url 'user_account:update-motorcycle' reservation.id %}" id="motorcycle_reservation_update_{{ reservation.id }}" style="display: none">
+                    {% csrf_token %}
+                    <p>Start date:</p>
+                    <input type="text" id="from_{{ reservation.id }}" name="start-date" value="" class="form-control">
+                    <p>End date:</p>
+                    <input type="text" id="to_{{ reservation.id }}" name="end-date" value="" class="form-control">
+                    <br>
+                    <input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Update reservation">
+                    <hr>
+                </form>
+                {% endfor %}
+            </div>
+            <div class="jumbotron">
+                <h2>Your service reservations:</h2>
+                {% for reservation in service_reservations %}
+                <li> Service: {{ reservation.service }}</li>
+                <ul> Date: {{ reservation.date_time }}</ul>
+                <div style="display: inline-block;">
+                    <p><a class="btn btn-secondary" href="{% url 'user_account:delete-service' reservation.id %}" role="button">Delete</a></p>
+                </div>
+                <div style="display: inline-block;">
+                    <button class="btn btn-secondary service_update_button" role="button" service-reservation-id="{{ reservation.id }}">Update</button>
+                </div>
+                <input type="hidden" id="unavailable-hours-{{ reservation.id }}" value="{{ unavailable_hours|get_item:reservation.service }}">
+                <form method="post" action="{% url 'user_account:update-service' reservation.id %}" id="service_reservation_update_{{ reservation.id }}" style="display: none">
+                    {% csrf_token %}
+                    <p>Date:</p>
+                    <input type="text" id="date_{{ reservation.id }}" name="date" value="" class="form-control">
+                    <p>Hour:</p>
+                    <input type="text" id="hour_{{ reservation.id }}" name="hour" value="" class="form-control">
+                    <br>
+                    <input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Update reservation">
+                    <hr>
+                </form>
+                {% endfor %}
+            </div>
+        </div>
+
+        <hr>
+
+    </div>
+
+</main>
+<script>
+    var buttons = document.querySelectorAll('.moto_update_button');
+
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener('click', function(event) {
+            event.preventDefault();
+            var reservationId = this.getAttribute('data-reservation-id');
+            var form = document.getElementById('motorcycle_reservation_update_' + reservationId);
+            if (form) {
+                var allForms = document.querySelectorAll('form[id^="motorcycle_reservation_update_"]');
+                for (var j = 0; j < allForms.length; j++) {
+                    if (allForms[j] !== form) {
+                        allForms[j].style.display = 'none';
+                    }
+                }
+                form.style.display = (form.style.display === 'none') ? 'block' : 'none';
+            }
+        });
+    }
+
+    $(document).on("focus", "input[name='start-date']", function() {
+        var form = $(this).closest('form');
+        var reservationId = form.attr('id').split('_').pop();
+        var fromId = 'from_' + reservationId;
+        var toId = 'to_' + reservationId;
+        initializeStartDatepicker(form, fromId, toId);
+    });
+
+    $(document).on("focus", "input[name='end-date']", function() {
+        var form = $(this).closest('form');
+        var reservationId = form.attr('id').split('_').pop();
+        var fromId = 'from_' + reservationId;
+        var toId = 'to_' + reservationId;
+        initializeEndDatepicker(form, fromId, toId);
+    });
+
+function initializeStartDatepicker(form, fromId, toId) {
+    var dateFormat = "yy-mm-dd";
+    var unavailableDates = $("#unavailable-dates-" + form.attr('id').split('_').pop()).val();
+    console.log(unavailableDates)
+
+    var from = form.find("#" + fromId).datepicker({
+        defaultDate: new Date(),
+        changeMonth: true,
+        changeYear: true,
+        minDate: 0,
+        numberOfMonths: 1,
+        dateFormat: dateFormat,
+        beforeShowDay: function(date) {
+            return disableDates(date, unavailableDates);
+        },
+                onSelect: function(dateText, inst) {
+            var to = form.find("#" + toId);
+            to.datepicker("option", "minDate", dateText);
+        }
+    });
+
+    from.on("change", function() {
+        var to = form.find("#" + toId);
+        to.datepicker("option", "minDate", getDate(this));
+    });
+
+    function getDate(element) {
+        var date;
+        try {
+            date = $.datepicker.parseDate(dateFormat, element.value);
+        } catch (error) {
+            date = null;
+        }
+        return date;
+    }
+
+    function disableDates(date, unavailableDates) {
+        var stringDate = $.datepicker.formatDate("yy-mm-dd", date);
+        var isUnavailable = unavailableDates.indexOf(stringDate) === -1;
+        return [
+            isUnavailable,
+            isUnavailable ? '' : 'unavailable-date',
+            isUnavailable ? 'This date is available' : 'unavailable-date'
+        ];
+    }
+}
+
+function initializeEndDatepicker(form, fromId, toId) {
+    var dateFormat = "yy-mm-dd";
+    var unavailableDates = $("#unavailable-dates-" + form.attr('id').split('_').pop()).val();
+
+    var to = form.find("#" + toId).datepicker({
+        defaultDate: new Date(),
+        changeMonth: true,
+        changeYear: true,
+        minDate: 0,
+        numberOfMonths: 1,
+        dateFormat: dateFormat,
+        beforeShowDay: function(date) {
+            return disableDates(date, unavailableDates);
+        },
+onSelect: function(dateText, inst) {
+            var from = form.find("#" + fromId);
+            from.datepicker("option", "maxDate", dateText);
+        }
+    });
+
+    to.on("change", function() {
+        var from = form.find("#" + fromId);
+        from.datepicker("option", "maxDate", getDate(this));
+    });
+
+    function getDate(element) {
+        var date;
+        try {
+            date = $.datepicker.parseDate(dateFormat, element.value);
+        } catch (error) {
+            date = null;
+        }
+        return date;
+    }
+
+    function disableDates(date, unavailableDates) {
+        var stringDate = $.datepicker.formatDate("yy-mm-dd", date);
+        var isUnavailable = unavailableDates.indexOf(stringDate) === -1;
+        return [
+            isUnavailable,
+            isUnavailable ? '' : 'unavailable-date',
+            isUnavailable ? 'This date is available' : 'unavailable-date'
+        ];
+    }
+}
+</script>
+<script>
+    var buttons = document.querySelectorAll('.service_update_button');
+
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener('click', function(event) {
+            event.preventDefault();
+            var reservationId = this.getAttribute('service-reservation-id');
+            var form = $('#service_reservation_update_' + reservationId);
+
+            var allForms = $('form[id^="service_reservation_update_"]');
+            allForms.not(form).hide();
+
+            if (form.is(':visible')) {
+                form.hide();
+            } else {
+                form.show();
+                var dateId = 'date_' + reservationId;
+                var hourId = 'hour_' + reservationId;
+                initializeDatepicker(form, dateId, hourId);
+            }
+        });
+    }
+
+    function initializeDatepicker(form, dateId, hourId) {
+        form.find("#" + dateId).datepicker({
+            dateFormat: "yy-mm-dd",
+            minDate: 0,
+            onSelect: function(hourText, inst) {
+                var selectedDate = form.find("input[name='date']").datepicker('getDate');
+                var busyTimesString = $("#unavailable-hours-" + form.attr('id').split('_').pop()).val();
+                busyTimesString = busyTimesString.replace(/\'/g, '\"');
+                var busyTimes = JSON.parse(busyTimesString);
+                blockUnavailableHours(selectedDate, busyTimes, hourId);
+            }
+        });
+
+        form.find("#" + hourId).timepicker({
+            timeFormat: 'h:i A',
+            step: 60,
+            minTime: '7:00AM',
+            maxTime: '4:00PM',
+            defaultTime: '',
+            startTime: '7:00',
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true,
+            disableTimeRanges: [[]],
+        });
+    }
+
+    function blockUnavailableHours(date, busyTimes, hourId) {
+        var stringDate = $.datepicker.formatDate("yy-mm-dd", date);
+        console.log(stringDate)
+        if (busyTimes[stringDate]) {
+            var unavailableHours = busyTimes[stringDate];
+            console.log(unavailableHours)
+            var disabledRanges = unavailableHours.map(function(hour) {
+                var startDate = new Date("2000-01-01 " + hour);
+                var endDate = new Date(startDate.getTime() + 60 * 1000);
+
+                var startHour = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                var endHour = endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                return [startHour, endHour];
+            });
+
+            $('#' + hourId).timepicker('option', 'disableTimeRanges', disabledRanges);
+        } else {
+            $('#' + hourId).timepicker('option', 'disableTimeRanges', []);
+        }
+    }
+
+</script>
+<footer class="container">
+    <p>&copy; Company 2017-2020</p>
+</footer>
+{% endblock %}

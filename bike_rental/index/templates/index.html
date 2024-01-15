@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand">DnDMotorcycles</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+            aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Home<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'rental:index-rental' %}">Rental<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'workshop:index-workshop' %}">WorkShop<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'contact:contact' %}">Contact<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% if user.is_authenticated %}
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-out' %}">Sign Out<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% else %}
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-in' %}">Sign In<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-up' %}">Sign Up<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% endif %}
+        {% if user.is_authenticated and user.groups.all.count == 0  %}
+        <a class="btn btn-outline-success my-2 my-sm-0" href="{% url 'user_account:index-account' %}">Account<span class="sr-only">(current)</span></a>
+        {% elif user.is_authenticated %}
+        <a class="btn btn-outline-success my-2 my-sm-0" href="/admin/">Admin<span class="sr-only">(current)</span></a>
+        {% endif %}
+    </div>
+</nav>
+
+<main role="main">
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-3">Welcome to DnDMotorcycles!</h1>
+            <p>We are one of the best motorcycle rental and workshop in the city! Our speciality are old classic bikes.</p>
+        </div>
+    </div>
+
+    {% for n in news %}
+    <div class="container">
+        <div class="list">
+            <div class="jumbotron">
+                <h2>{{ n.title }}</h2>
+                <p>{{ n.summary }}</p>
+                <p><a class="btn btn-secondary" href="{% url 'index:news-detail' n.slug %}" role="button">View details &raquo;</a></p>
+            </div>
+        </div>
+        <hr>
+    </div> <!-- /container -->
+    {% endfor %}
+</main>
+
+<footer class="container">
+    <p>&copy; Company 2017-2020</p>
+</footer>
+{% endblock %}

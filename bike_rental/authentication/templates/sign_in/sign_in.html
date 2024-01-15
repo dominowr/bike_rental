@@ -1,0 +1,75 @@
+{% extends '../base.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <p class="navbar-brand">DnDMotorcycles</p>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+            aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'index:index' %}">Home<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'rental:index-rental' %}">Rental<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'workshop:index-workshop' %}">WorkShop<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'contact:contact' %}">Contact<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<main role="main">
+
+    <div class="container center">
+        <div class="list">
+            <div class="jumbotron">
+                <form method="POST" action="{% url 'authentication:sign-in' %}">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    {{ field.label_tag }} {{ field }}
+                    {% endfor %}
+                    <input type="submit" class="btn btn-secondary" value="Sign In!">
+                </form>
+                {% if form.errors %}
+                <div class="error"  style="display: flex; justify-content: center; color: red;">
+                    {% for error in form.non_field_errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <br>
+                {% if messages %}
+                <div class="alert alert-success">
+                    {% for message in messages %}
+                    {% if 'success' in message.tags %}
+                    <div class="{{ message.tags }}">{{ message }}</div>
+                    {% endif %}
+                    {% if 'info' in message.tags %}
+                    <div class="{{ message.tags }}">{{ message }}</div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <p>New to the page? Create account <a class="nav_link" href="{% url 'authentication:sign-up' %}">Here.</a> </p>
+            <p>Forget your password? Click <a class="nav_link" href="{% url 'authentication:password-reset' %}">Here.</a> </p>
+        </div>
+        <hr>
+    </div> <!-- /container -->
+
+</main>
+
+<footer class="container">
+    <p>&copy; Company 2017-2020</p>
+</footer>
+{% endblock %}

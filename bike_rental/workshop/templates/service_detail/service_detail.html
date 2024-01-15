@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %} {{ service.name }} {% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand">DnDMotorcycles</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+            aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'index:index' %}">Home<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'rental:index-rental' %}">Rental<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'workshop:index-workshop' %}">WorkShop<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'contact:contact' %}">Contact<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% if user.is_authenticated %}
+
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-out' %}">Sign Out<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% else %}
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-in' %}">Sign In<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-up' %}">Sign Up<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% endif %}
+        {% if user.is_authenticated and user.groups.all.count == 0  %}
+        <a class="btn btn-outline-success my-2 my-sm-0" href="{% url 'user_account:index-account' %}">Account<span class="sr-only">(current)</span></a>
+        {% elif user.is_authenticated %}
+        <a class="btn btn-outline-success my-2 my-sm-0" href="/admin/">Admin<span class="sr-only">(current)</span></a>
+        {% endif %}
+    </div>
+</nav>
+
+<main role="main">
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-4">{{ service.name }}</h1>
+        </div>
+    </div>
+    <div class="container">
+        <!-- Example row of columns -->
+        <div class="list">
+            <div class="jumbotron">
+                <div class="center_pic">
+                    <div class="service-image">
+                        <img src="{{ service.serviceimages_set.first.image.url }}" alt="{{ service.name }}" class="current-image">
+                        <br>
+                        <br>
+                        <button class="prev" onclick="changeImage(-1)">&#10094;</button>
+                        <button class="next" onclick="changeImage(1)">&#10095;</button>
+                    </div>
+                    <br>
+                    <br>
+                    <h3>Description:</h3>
+                    <p>{{ service.description }}</p>
+                    <br>
+                    <h3>Price:</h3>
+                    <p>{{ service.price }} $</p>
+                    <br>
+                    <input type="hidden" id="unavailable_hours" value="{{ unavailable_hours }}">
+                    <h3>Set appointment:</h3>
+                    <form method="POST" action="{% url 'workshop:set-reservation' %}?slug={{ service.slug }}">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <br>
+                        {{ field.label_tag }} {{ field }}
+                        {% endfor %}
+                        <br>
+                        <br>
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Set up</button>
+                    </form>
+                    <br>
+                    {% if messages %}
+                    {% for message in messages %}
+                    {% if 'error' in message.tags %}
+                    <div class="alert alert-danger">
+                        <div class="{{ message.tags }}">{{ message }}</div>
+                    </div>
+                    {% endif %}
+                    {% if 'success' in message.tags %}
+                    <div class="alert alert-success">
+                        <div class="{{ message.tags }}">{{ message }}</div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div> <!-- /container -->
+
+</main>
+
+<footer class="container">
+    <p>&copy; Company 2017-2020</p>
+</footer>
+<script>
+    function blockUnavailableHours(date, busyTimes) {
+        var stringDate = $.datepicker.formatDate("yy-mm-dd", date);
+
+        if (busyTimes[stringDate]) {
+            var unavailableHours = busyTimes[stringDate];
+
+            var disabledRanges = unavailableHours.map(function(hour) {
+                var startDate = new Date("2000-01-01 " + hour);
+                var endDate = new Date(startDate.getTime() + 60 * 1000);
+
+                var startHour = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                var endHour = endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                return [startHour, endHour];
+            });
+
+            $('#timepicker').timepicker('option', 'disableTimeRanges', disabledRanges);
+        } else {
+            $('#timepicker').timepicker('option', 'disableTimeRanges', []);
+        }
+    }
+
+    $(function() {
+        $("#datepicker").datepicker({
+            dateFormat: "yy-mm-dd",
+            minDate: 0,
+            onSelect: function(dateText, inst) {
+                var selectedDate = $(this).datepicker('getDate');
+                var busyTimes = {{ unavailable_hours|safe }};
+                blockUnavailableHours(selectedDate, busyTimes);
+            }
+        });
+
+
+        $("#timepicker").timepicker({
+            timeFormat: 'h:i A',
+            step: 60,
+            minTime: '7:00AM',
+            maxTime: '4:00PM',
+            defaultTime: '',
+            startTime: '7:00',
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true,
+            disableTimeRanges: [[]],
+        });
+    });
+
+</script>
+<script>
+    const images = [
+        {% for image in service.serviceimages_set.all %}
+            '{{ image.image.url }}',
+        {% endfor %}
+    ];
+    let currentImage = 0;
+
+    function changeImage(n) {
+        currentImage = (currentImage + n + images.length) % images.length;
+        const img = document.querySelector('.current-image');
+        img.src = images[currentImage];
+    }
+</script>
+{% endblock %}

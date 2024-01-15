@@ -1,0 +1,25 @@
+{% extends '../base.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+<main role="main">
+    <div class="container center">
+        <!-- Example row of columns -->
+        <div class="list">
+            <div class="jumbotron">
+                <form method="post">{% csrf_token %}
+                    <p>Are you sure you want to delete reservation on {{ object.service.name }}, </p>
+                    <p>from the {{ object.date_time }}? </p>
+                    <input type="submit" value="Confirm">
+                </form>
+            </div>
+        </div>
+        <hr>
+    </div> <!-- /container -->
+</main>
+
+<footer class="container">
+    <p>&copy; Company 2017-2020</p>
+</footer>
+{% endblock %}

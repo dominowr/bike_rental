@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand">DnDMotorcycles</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+            aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'index:index' %}">Home<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'rental:index-rental' %}">Rental<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'workshop:index-workshop' %}">WorkShop<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'contact:contact' %}">Contact<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% if user.is_authenticated %}
+
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-out' %}">Sign Out<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% else %}
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-in' %}">Sign In<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-up' %}">Sign Up<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% endif %}
+        {% if user.is_authenticated and user.groups.all.count == 0  %}
+        <a class="btn btn-outline-success my-2 my-sm-0" href="{% url 'user_account:index-account' %}">Account<span class="sr-only">(current)</span></a>
+        {% elif user.is_authenticated %}
+        <a class="btn btn-outline-success my-2 my-sm-0" href="/admin/">Admin<span class="sr-only">(current)</span></a>
+        {% endif %}
+    </div>
+</nav>
+
+<main role="main">
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-4">{{ motorcycle.model }}</h1>
+        </div>
+    </div>
+    <div class="container">
+        <!-- Example row of columns -->
+        <div class="list">
+            <div class="jumbotron">
+                <div class="center_pic">
+                    <img src="{{ motorcycle.image.url }}" alt="{{ motorcycle.model }}" class="current-image">
+                    <br>
+                    <br>
+                    <h3>Description:</h3>
+                    <p>{{ motorcycle.description }}</p>
+                    <br>
+                    <h3>Tech Specs:</h3>
+                    <p>Year: {{ motorcycle.year }}</p>
+                    <p>Engine: {{ motorcycle.engine }}</p>
+                    <p>Torque: {{ motorcycle.torque }} Nm</p>
+                    <p>Capacity: {{ motorcycle.capacity }} cc</p>
+                    <p>Top speed: {{ motorcycle.top_speed }} km/h</p>
+                    <p>Wet weight: {{ motorcycle.wet_weight }} kg</p>
+                    <br>
+                    <h3>Price List</h3>
+                    <table>
+                        <tr>
+                            <th>
+                                Rental period
+                            </th>
+                            <th>
+                                Rental price / per day
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                1 - 3 Days
+                            </td>
+                            <td>
+                                {{ motorcycle.rental_price }} $
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                4 - 7 Days
+                            </td>
+                            <td>
+                                {{ rental_price_4_7_days }} $
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                8 - 100 Days
+                            </td>
+                            <td>
+                                {{ rental_price_over_7_days }} $
+                            </td>
+                        </tr>
+                    </table>
+                    <br>
+                    <br>
+                    <h3>Motorcycle Reservation:</h3>
+                    <input type="hidden" id="unavailable-dates" value="{{ unavailable_dates }}">
+                    <form method="POST" action="{% url 'rental:create-reservation' %}?slug={{ motorcycle.slug }}">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <br>
+                        {{ field.label_tag }} {{ field }}
+                        {% endfor %}
+                        <br>
+                        <br>
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Reserve</button>
+                    </form>
+                    <br>
+                    {% if messages %}
+                    {% for message in messages %}
+                    {% if 'error' in message.tags %}
+                    <div class="alert alert-danger">
+                        <div class="{{ message.tags }}">{{ message }}</div>
+                    </div>
+                    {% endif %}
+                    {% if 'success' in message.tags %}
+                    <div class="alert alert-success">
+                        <div class="{{ message.tags }}">{{ message }}</div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                    <br>
+                    {% if recently_viewed %}
+                    <h3>Recently viewed:</h3>
+                    <div class="recently-viewed">
+                        {% for motorcycle in recently_viewed %}
+                        <div class="recently-viewed-item">
+                            <div>
+                                <img src="{{ motorcycle.image.url }}" alt="{{ motorcycle.model }}" class="recently-viewed-img">
+                            </div>
+                            <div>
+                                <p><a href="{% url 'rental:bike-detail' motorcycle.slug %}">{{ motorcycle.model }}</a></p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div> <!-- /container -->
+
+</main>
+
+<footer class="container">
+    <p>&copy; Company 2017-2020</p>
+</footer>
+<script>
+
+    $(function() {
+        var dateFormat = "yy-mm-dd";
+
+        var unavailableDates = {{ unavailable_dates|safe }};
+        console.log(unavailableDates)
+
+        function disableDates(date) {
+            var stringDate = $.datepicker.formatDate(dateFormat, date);
+            if ($.inArray(stringDate, unavailableDates) !== -1) {
+                return [false, 'unavailable-date', 'This date is unavailable'];
+            } else {
+                return [true, ''];
+            }
+        }
+
+        var from = $("#from").datepicker({
+            defaultDate: new Date(),
+            changeMonth: true,
+            changeYear: true,
+            minDate:0,
+            numberOfMonths: 1,
+            dateFormat: dateFormat,
+            beforeShowDay: disableDates
+        }).on("change", function() {
+            to.datepicker("option", "minDate", getDate(this));
+        });
+
+        var to = $("#to").datepicker({
+            defaultDate: new Date(),
+            changeMonth: true,
+            changeYear: true,
+            minDate:0,
+            numberOfMonths: 1,
+            dateFormat: dateFormat,
+            beforeShowDay: disableDates
+        }).on("change", function() {
+            from.datepicker("option", "maxDate", getDate(this));
+        });
+
+        function getDate(element) {
+            var date;
+            try {
+                date = $.datepicker.parseDate(dateFormat, element.value);
+            } catch (error) {
+                date = null;
+            }
+            return date;
+        }
+    });
+</script>
+{% endblock %}

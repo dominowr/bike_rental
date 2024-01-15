@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('DnD Motorcycles') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">
+    {% if user.is_anonymous %}
+        {{ site_header|default:_('DnD Motorcycles administration') }}
+    {% endif %}
+    {% for group in request.user.groups.all %}
+        {% if group.name == 'admin' %}
+            DnD Motorcycles Admin Panel
+        {% elif group.name == 'rental_admin' %}
+            DnD Motorcycles Rental Admin Panel
+        {% elif group.name == 'rental_worker' %}
+            DnD Motorcycles Rental Worker Panel
+        {% elif group.name == 'workshop_admin' %}
+            DnD Motorcycles Workshop Admin Panel
+        {% elif group.name == 'workshop_worker' %}
+            DnD Motorcycles Workshop Worker Panel
+        {% endif %}
+    {% endfor %}
+</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

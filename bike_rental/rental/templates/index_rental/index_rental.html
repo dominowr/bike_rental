@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %} Rental {% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand">DnDMotorcycles</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+            aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'index:index' %}">Home<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'rental:index-rental' %}">Rental<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'workshop:index-workshop' %}">WorkShop<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'contact:contact' %}">Contact<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% if user.is_authenticated %}
+
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-out' %}">Sign Out<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% else %}
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-in' %}">Sign In<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'authentication:sign-up' %}">Sign Up<span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        {% endif %}
+        {% if user.is_authenticated and user.groups.all.count == 0  %}
+        <a class="btn btn-outline-success my-2 my-sm-0" href="{% url 'user_account:index-account' %}">Account<span class="sr-only">(current)</span></a>
+        {% elif user.is_authenticated %}
+        <a class="btn btn-outline-success my-2 my-sm-0" href="/admin/">Admin<span class="sr-only">(current)</span></a>
+        {% endif %}
+    </div>
+</nav>
+
+<main role="main">
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-4">Rent a motorcycle and go back in time!</h1>
+            <br>
+            <p>In our rental we have old dual sports motorcycles, that draw directly from the legacy of the Paris Dakar Rally.
+                Rent one of them today and feel like Stephane Peterhansel rushing through gravel or sandy roads! Or maybe
+                you are inspire by Freddy Spencer ? Don't worry in our rental you can find old sports motorcycles too.</p>
+        </div>
+    </div>
+    <br>
+    <div class="container text-center">
+        <div class="row">
+            <div class="col">
+                <div class="dropdown">
+                    <div class="margin_left_filter">
+                        <h3>Filter</h3>
+                    </div>
+                    <p>Category</p>
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdown2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {% if slug %}
+                        {{ slug }}
+                        {% else %}
+                        All
+                        {% endif %}
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdown2">
+                        <a class="dropdown-item" href="{% url 'rental:index-rental' %}">All</a>
+                        {% for category in categories %}
+                        <a class="dropdown-item" href="{% url 'rental:category-filter' category.category %}">{{category.category|title}}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col margin_left_button1">
+                <br>
+                <br>
+                <p>Capacity</p>
+                {% csrf_token %}
+                {% if slug %}
+                <form method="GET" action="{% url 'rental:category-filter' slug=slug %}">
+                    {% else %}
+                    <form method="GET" action="{% url 'rental:index-rental'%}">
+                        {% endif %}
+                        <input placeholder="form" type="number" name="capacity_from" value="{{ capacity_from }}">
+                        <input placeholder="to" type="number" name="capacity_to" value="{{ capacity_to }}">
+                        <br>
+                        <br>
+                        <button class="btn btn-secondary" type="submit">Search</button>
+                        {% if slug %}
+                        <a class="btn btn-secondary" href="{% url 'rental:category-filter' slug=slug %}">Restart filters</a>
+                        {% else %}
+                        <a class="btn btn-secondary" href="{% url 'rental:index-rental'%}">Restart filters</a>
+                        {% endif %}
+                    </form>
+                </form>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="container">
+        <!-- Example row of columns -->
+        {% for motorcycle in motorcycles %}
+        <div class="list">
+            <div class="jumbotron">
+                <div class="center_pic">
+                    <h2>{{ motorcycle.model }}</h2>
+                    <img src="{{ motorcycle.image.url }}" alt="{{ motorcycle.model }}" class="current-image">
+                    <a class="btn btn-secondary" href="{% url 'rental:bike-detail' motorcycle.slug %}" role="button">View details &raquo;</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div> <!-- /container -->
+
+</main>
+
+<footer class="container">
+    <p>&copy; Company 2017-2020</p>
+</footer>
+{% endblock %}

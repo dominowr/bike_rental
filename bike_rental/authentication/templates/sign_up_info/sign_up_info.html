@@ -1,0 +1,34 @@
+{% extends '../base.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+<main role="main">
+    <div class="container center">
+        <!-- Example row of columns -->
+        <div class="list">
+            <div class="jumbotron">
+                <p>
+                    Your account has been created successfully, please check your email for verification link to
+                    activate it.
+                </p>
+                <p>
+                    Click <a href="{% url 'authentication:sign-in' %}">here</a>
+                    if your browser doesn't redirect you automatically.
+                </p>
+
+            </div>
+        </div>
+        <hr>
+    </div> <!-- /container -->
+    <script>
+        setTimeout(function() {
+            window.location.href = "{% url 'authentication:sign-in' %}";
+        }, 5000);
+    </script>
+</main>
+
+<footer class="container">
+    <p>&copy; Company 2017-2020</p>
+</footer>
+{% endblock %}

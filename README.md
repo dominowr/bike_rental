@@ -130,7 +130,7 @@ http POST http://127.0.0.1:8000/api/users/registration/ \
   password2='Anduril!1'
 ```
 #### Success Response:
-Code: ```200 OK```   
+Code: ```201 CREATED```   
 
 Content example:   
 ```json

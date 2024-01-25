@@ -51,6 +51,7 @@ docker compose exec web python manage.py createsuperuser
 ```
 
 
+
 ## API Reference
 
 ### Open Endpoints:
@@ -71,7 +72,7 @@ e
 Code: ```200 OK```   
 
 Content example:   
-```http
+```
 http POST http://127.0.0.1:8000/api/api-token-auth/ \
   username=classic_boromir \
   password=SonOfDenethor
@@ -119,7 +120,7 @@ Optional fields:
 }
 ```
 Example usage:
-```http
+```
 http POST http://127.0.0.1:8000/api/users/registration/ \
   username=theKing \
   first_name=Aragorn \
@@ -315,7 +316,7 @@ Data constraints:
 }
 ```
 Example usage:
-```http
+```
 http -form POST http://127.0.0.1:8000/api/motorcycles/add/ 'Authorization: Token YourSecretTokenMrBaggins' \
   capacity=750 \
   category=Enduro \

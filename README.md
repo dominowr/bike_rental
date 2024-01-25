@@ -6,16 +6,16 @@ The application allows users to book motorcycles and schedule appointments at th
 ## Features
 
 - User account creation and management
-- Role division: super admin, rental admin, rental worker, workshop admin, 
-  workshop worker, user
 - Motorcycle reservations
 - Scheduling appointments at the motorcycle workshop
+- API
 
 
 ## Tech Stack
 
 - Django (Python)
 - PostgreSQL
+- Django REST framework
 - Docker
 - HTML, CSS, JavaScript
 

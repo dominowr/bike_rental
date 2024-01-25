@@ -323,7 +323,7 @@ http -form POST http://127.0.0.1:8000/api/motorcycles/add/ 'Authorization: Token
   description="Yamaha SuperTener beautiful motorcycle." \
   engine="parallel twin" \
   fuel_capacity=23 \
-  image@/Users/dominik/Desktop/supertenere-750.jpeg \
+  image@/Users/gandalf/Desktop/supertenere-750.jpeg \
   model="Yamaha XTZ750 Super Ténéré" \
   rental_price="250.00" \
   slug="yamaha-xtz750-super-tenere" \

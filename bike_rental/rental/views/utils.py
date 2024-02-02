@@ -28,7 +28,19 @@ def get_unavailable_dates(motorcycle):
 
 
 def send_confirmation_mail(user, motorcycle, start_date, end_date, date_range):
+    """
+     Sends a confirmation email with reservation details and total price to the user.
+     Calculates the total price based on the rental period.
 
+     :param user: The user making the reservation.
+     :param motorcycle: The reserved motorcycle.
+     :param start_date: The start date of the reservation.
+     :param end_date: The end date of the reservation.
+     :param date_range: List of dates included in the reservation.
+
+     Note:
+     The price is calculated based on the number of rental days and potential discounts.
+     """
     days = len(date_range)
     price = None
 

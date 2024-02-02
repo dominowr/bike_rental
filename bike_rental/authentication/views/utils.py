@@ -7,6 +7,10 @@ from django.shortcuts import reverse
 
 
 def send_activation_mail(user):
+    """
+    Sends an activation email to a newly registered user.
+    :param user: The user object for whom the activation email is being sent.
+    """
     token = default_token_generator.make_token(user)
     uidb64 = urlsafe_base64_encode(force_str(user.pk).encode())
 

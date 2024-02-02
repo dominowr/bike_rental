@@ -13,6 +13,13 @@ class PasswordValidator:
 
     @staticmethod
     def clean_password(password):
+        """
+        Validates the provided password based on specific criteria.
+        :param password: The password to be validated.
+
+        Raises:
+            - ValidationError: If the password does not meet the specified criteria.
+        """
         regex = r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$'
 
         if not re.match(regex, password):
@@ -24,7 +31,14 @@ class PasswordValidator:
 
     @staticmethod
     def clean_password2(password1, password2):
+        """
+        Validates that two provided passwords match.
+        :param password1: The first password.
+        :param password2: The second password.
 
+        Raises:
+            - ValidationError: If the passwords do not match.
+        """
         if password1 != password2:
             raise ValidationError(
                 PasswordValidator.error_messages['password_mismatch'],

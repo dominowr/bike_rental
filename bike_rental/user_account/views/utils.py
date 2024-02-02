@@ -5,6 +5,14 @@ from workshop.views.utils import get_unavailable_hours
 
 
 def get_unavailable_dates_dict(reservations):
+    """
+    Returns a dictionary mapping motorcycles to their unavailable dates based on existing reservations.
+
+    :param reservations: List of reservation objects.
+
+    :return:
+        dict: A dictionary where keys are motorcycles and values are lists of unavailable dates.
+    """
     unavailable_dates_dict = {}
     for reservation in reservations:
         motorcycle = reservation.motorcycle
@@ -19,6 +27,15 @@ def get_unavailable_dates_dict(reservations):
 
 
 def get_unavailable_hours_dict(reservations):
+    """
+     Returns a dictionary mapping services to their unavailable hours based on existing reservations.
+
+     :param reservations: List of reservation objects.
+
+     :return:
+        dict: A dictionary where keys are services and values are dictionaries
+        mapping dates to lists of unavailable hours.
+     """
     unavailable_hours_dict = {}
     for reservation in reservations:
         service = reservation.service

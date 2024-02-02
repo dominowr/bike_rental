@@ -32,7 +32,14 @@ def get_unavailable_hours(slug):
 
 
 def send_confirmation_mail(user, service, date, hour):
+    """
+    Sends a confirmation email with details of the workshop appointment to the user.
 
+    :params user: The user making the appointment.
+    :params service: The booked workshop service.
+    :params date: The date of the appointment.
+    :params hour: The scheduled hour of the appointment.
+    """
     send_mail(
         subject='Workshop appointment confirmation',
         message=f'''

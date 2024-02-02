@@ -4,6 +4,9 @@ from django.db.models import Manager, QuerySet
 
 class AppManager(Manager):
     def get_queryset(self):
+        """
+        Returns a QuerySet excluding records with 'is_deleted' set to True.
+        """
         return QuerySet(self.model, using=self._db).exclude(is_deleted=True)
 
 

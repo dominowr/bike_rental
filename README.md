@@ -1,14 +1,23 @@
 
 # Motorcycle Rental & Workshop Application
 
-The application allows users to book motorcycles and schedule appointments at the motorcycle workshop. Users can create accounts, browse available motorcycles, make reservations, and manage their data.
+This is a fully functional web application which allows Users to book motorcycles and schedule appointments at the motorcycle workshop.   
+Users can create accounts, browse all motorcycles with filtering, make reservations and manage their data.
 
 ## Features
 
-- User account creation and management
+- User account creation and data management
 - Motorcycle reservations
 - Scheduling appointments at the motorcycle workshop
-- API
+- Filtering:
+  - Intuitive motorcycle filtering options for Users to find the perfect motorcycles, based on their type (sport/enduro/etc.) and engine capacity
+- Date and time availability:
+  - A user-friendly date picker to check availability of chosen motorcycle and workshop appointments. Unavailable dates are blocked in picker.
+-Automated email notifications:
+  - Users receive account activation link after registrations
+  - User receive detailed confirmation emails after making or updating a reservations, containing all relevant information
+  - Automated email notifications are sent to admin email account when users modify or delete their reservation
+
 
 
 ## Tech Stack
@@ -57,42 +66,8 @@ docker compose exec web python manage.py createsuperuser
 ### Open Endpoints:
 Open endpoints require no Authentication:
 
-### * User Login:   
-
-   
-Used to collect a Token for registered User.
-
-URL: ```/api/api-token-auth/```.  
-Method: ```POST```.  
-   
-Data constraints:
-
-e
-#### Success Response:
-Code: ```200 OK```   
-
-Content example:   
-```
-http POST http://127.0.0.1:8000/api/api-token-auth/ \
-  username=classic_boromir \
-  password=SonOfDenethor
-```
-
-#### Error Response   
-Condition: If 'username' or 'password' combination is wrong.   
-Code: ```400 BAD REQUEST```
 
 
-Content example:
-```json
-{
-    "non_field_errors": [
-        "Unable to login with provided credentials."
-    ]
-}
-```
-
-___
 ### * User Registration:   
 
    
@@ -196,7 +171,7 @@ Content example:
     "engine": "parallel twin",
     "fuel_capacity": 23,
     "id": 3,
-    "image": "http://127.0.0.1:8000/media/images/rental/cagiva-elefant_DMiZVCU.jpeg",
+    "image": "http://127.0.0.1:8000/media/images/rental/yamaha-supertenere.jpeg",
     "model": "Yamaha XTZ750 Super Ténéré",
     "rental_price": "250.00",
     "slug": "yamaha-xtz750-super-tenere",
@@ -223,7 +198,7 @@ Code: ```200 OK```
 Content example:
 ```json
 {
-    "description": "Carburetors cleaning, beautiful carburetros. Lorem ipsum.",
+    "description": "Carburetors cleaning, beautiful carburetors. Lorem ipsum.",
     "id": 1,
     "name": "Carburetors cleaning",
     "price": 100
@@ -240,7 +215,7 @@ Used to collect a list of all registered Users with motorcycles and services res
 
 URL: ```/api/users/```  
 Method: ```GET```  
-Authorization __SuperUser__  
+Authorization: __SuperUser__  
 Example usage:
 ```
 http GET http://127.0.0.1:8000/api/users/ 'Authorization: Token YourSecretTokenMrBaggins'
@@ -332,6 +307,43 @@ http -form POST http://127.0.0.1:8000/api/motorcycles/add/ 'Authorization: Token
   wet_weight=190 \
   year=1989
 ```
+TBC
+
+___
+Endpoints for user authentication will be continued: 
+### * User Login:   
+
+   
+Used to collect a Token for registered User.
+
+URL: ```/api/api-token-auth/```.  
+Method: ```POST```.  
+   
+
+#### Success Response:
+Code: ```200 OK```   
+
+Content example:   
+```
+http POST http://127.0.0.1:8000/api/api-token-auth/ \
+  username=classic_boromir \
+  password=SonOfDenethor
+```
+
+#### Error Response   
+Condition: If 'username' or 'password' combination is wrong.   
+Code: ```400 BAD REQUEST```
+
+
+Content example:
+```json
+{
+    "non_field_errors": [
+        "Unable to login with provided credentials."
+    ]
+}
+```
+
 ## Authors
 
 - [@dominowr](https://www.github.com/dominowr)
